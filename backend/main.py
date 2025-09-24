@@ -31,6 +31,7 @@ except ImportError:
 
 
 ENABLE_CV = os.getenv('ENABLE_COMPUTER_VISION', 'true').lower() == 'true'
+CV_PLACEHOLDER = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='640' height='360'><rect width='100%' height='100%' fill='#4a5568'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='24'>Computer vision disabled</text></svg>"
 
 # Computer Vision modulleri
 cv_available = False
@@ -166,10 +167,22 @@ def get_audio(filename):
     return send_from_directory(RESULT_DIR, safe_name, mimetype='audio/wav', as_attachment=False, conditional=True)
 
 # CV route'lar aynı kalsın...
+
+
 @app.route('/api/process_frame', methods=['POST'])
 def process_frame():
     if not cv_available or not detection_system:
-        return jsonify({'success': False, 'error': 'CV modülü yüklenemedi'})
+        return jsonify({
+            'success': True,
+            'objects': [],
+            'hands': 0,
+            'faces': 0,
+            'pose_detected': False,
+            'fingers': 0,
+            'gesture': None,
+            'fps': 0,
+            'processed_frame': CV_PLACEHOLDER
+        })
 
     try:
         data = request.get_json()
@@ -201,7 +214,6 @@ def process_frame():
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
-
 @app.route('/api/get_detection_results')
 def get_detection_results():
     if not cv_available or not detection_system:
