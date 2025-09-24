@@ -17,7 +17,7 @@ COPY computer_vision ./computer_vision
 COPY docs ./docs
 
 ENV RESULT_DIR=/app/result
-RUN mkdir -p ""
+RUN mkdir -p "$RESULT_DIR"
 
 EXPOSE 5000
 
