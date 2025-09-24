@@ -29,6 +29,9 @@ except ImportError:
     print("⚠️ LLM modülleri yüklenemedi")
     llm_available = False
 
+
+ENABLE_CV = os.getenv('ENABLE_COMPUTER_VISION', 'true').lower() == 'true'
+
 # Computer Vision modulleri
 cv_available = False
 if ENABLE_CV:
@@ -56,7 +59,6 @@ else:
 CORS(app, resources={r"/api/*": {"origins": cors_origins}, r"/audio/*": {"origins": cors_origins}})
 
 RESULT_DIR = os.environ.get('RESULT_DIR', os.path.join(root_dir, 'result'))
-ENABLE_CV = os.getenv('ENABLE_COMPUTER_VISION', 'true').lower() == 'true'
 os.makedirs(RESULT_DIR, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = RESULT_DIR
 app.config['RESULT_DIR'] = RESULT_DIR
@@ -234,3 +236,4 @@ if __name__ == "__main__":
         print("Kamera başlatılamadı")
 
     app.run(debug=True, host="0.0.0.0", port=5000)
+
