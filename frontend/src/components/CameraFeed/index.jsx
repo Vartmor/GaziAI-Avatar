@@ -8,6 +8,7 @@ export default function CameraFeed() {
   const lowResCanvasRef = useRef(null);
   const [stream, setStream] = useState(null);
   const [cvData, setCvData] = useState({ hands: 0, faces: 0, fingers: 0, gesture: null });
+  const [cvMode, setCvMode] = useState('full');
   const setCvResults = useAppStore((s) => s.setCvResults);
   const [isLoading, setIsLoading] = useState(true);
   const [fps, setFps] = useState(0);
@@ -30,9 +31,9 @@ export default function CameraFeed() {
 
         const mediaStream = await navigator.mediaDevices.getUserMedia({
           video: {
-            width: { ideal: 640 },
-            height: { ideal: 480 },
-            frameRate: { ideal: 30, max: 30 }
+            width: { ideal: 480, max: 480 },
+            height: { ideal: 360, max: 360 },
+            frameRate: { ideal: 20, max: 24 }
           }
         });
 
@@ -94,16 +95,16 @@ export default function CameraFeed() {
     isProcessingRef.current = true;
 
     try {
-      canvasElement.width = 640;
-      canvasElement.height = 480;
+      canvasElement.width = 480;
+      canvasElement.height = 360;
       const ctx = canvasElement.getContext('2d');
-      ctx.drawImage(videoElement, 0, 0, 640, 480);
+      ctx.drawImage(videoElement, 0, 0, 480, 360);
 
       const lowResCtx = lowResCanvasElement.getContext('2d');
-      lowResCanvasElement.width = 640;
-      lowResCanvasElement.height = 480;
-      lowResCtx.drawImage(videoElement, 0, 0, 640, 480);
-      const frameData = lowResCanvasElement.toDataURL('image/jpeg', 0.25);
+      lowResCanvasElement.width = 320;
+      lowResCanvasElement.height = 240;
+      lowResctx.drawImage(videoElement, 0, 0, 480, 360);
+      const frameData = lowResCanvasElement.toDataURL('image/jpeg', 0.18);
 
       const response = await fetch(apiUrl('/api/process_frame'), {
         method: 'POST',
@@ -114,6 +115,7 @@ export default function CameraFeed() {
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const result = await response.json();
+      setCvMode(result.cv_mode || 'full');
       if (result.success) {
         const processedImg = document.getElementById('processed-frame');
         if (processedImg) {
@@ -139,9 +141,10 @@ export default function CameraFeed() {
   };
 
   useEffect(() => {
-    const interval = setInterval(processFrame, 120);
+    const delay = cvMode === 'lite' ? 220 : 150;
+    const interval = setInterval(processFrame, delay);
     return () => clearInterval(interval);
-  }, []);
+  }, [cvMode, stream]);
 
   return (
     <div className="camera-container">
@@ -180,10 +183,16 @@ export default function CameraFeed() {
       </div>
 
       <div className="cv-results">
-        <div>Eller: {cvData.hands}</div>
-        <div>Yüzler: {cvData.faces}</div>
-        <div>Parmaklar: {cvData.fingers ?? 0}</div>
-        <div>İşaret: {cvData.gesture || '-'}</div>
+        {cvMode === 'lite' ? (
+          <div style={{ color: '#63b3ed' }}>Info: Lite mode streams the camera only.</div>
+        ) : (
+          <>
+            <div>Eller: {cvData.hands}</div>
+            <div>Yuzler: {cvData.faces}</div>
+            <div>Parmaklar: {cvData.fingers ?? 0}</div>
+            <div>Isaret: {cvData.gesture || '-'} </div>
+          </>
+        )}
       </div>
     </div>
   );

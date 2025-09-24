@@ -31,18 +31,25 @@ except ImportError:
 
 
 ENABLE_CV = os.getenv('ENABLE_COMPUTER_VISION', 'true').lower() == 'true'
+CV_MODE = os.getenv('CV_MODE', 'full').lower()
+if CV_MODE not in {'full', 'lite'}:
+    CV_MODE = 'full'
 CV_PLACEHOLDER = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='640' height='360'><rect width='100%' height='100%' fill='#4a5568'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='24'>Computer vision disabled</text></svg>"
 
 # Computer Vision modulleri
 cv_available = False
 if ENABLE_CV:
-    try:
-        from computer_vision.unified_detection import UnifiedDetectionSystem  # Root'tan
+    if CV_MODE == 'lite':
         cv_available = True
-        print("Computer Vision modulleri basariyla yuklendi!")
-    except ImportError as e:
-        print(f"Uyari: Computer Vision modulleri yuklenemedi: {e}")
-        cv_available = False
+        print("Computer Vision lite mode active: streaming raw camera frames")
+    else:
+        try:
+            from computer_vision.unified_detection import UnifiedDetectionSystem  # Root'tan
+            cv_available = True
+            print("Computer Vision modulleri basariyla yuklendi!")
+        except ImportError as e:
+            print(f"Uyari: Computer Vision modulleri yuklenemedi: {e}")
+            cv_available = False
 else:
     print("Computer Vision modulleri konfigurasyon ile devre disi")
 
@@ -72,106 +79,24 @@ except ValueError:
 
 # Global detection system - sadece bir kez initialize et
 detection_system = None
-if cv_available:
+if cv_available and CV_MODE == 'full':
     try:
         detection_system = UnifiedDetectionSystem()
         print("Computer Vision modulleri basariyla baslatildi!")
     except Exception as e:
         print(f"Hata: Computer Vision baslatma hatasi: {e}")
         cv_available = False
+elif cv_available and CV_MODE == 'lite':
+    print("Computer Vision lite mode: skipping heavy detection pipeline")
 
-# Ses dosyaları buraya kaydedilecek
-# Kamera başlatma fonksiyonu
-def initialize_camera():
-    try:
-        if cv_available and detection_system:
-            if detection_system.start_camera():
-                print("Kamera başarıyla başlatıldı")
-                return True
-            else:
-                print("Kamera başlatılamadı")
-                return False
-        return False
-    except Exception as e:
-        print(f"Kamera başlatma hatası: {e}")
-        return False
-
-
-
-@app.route('/health', methods=['GET'])
-def health():
-    return jsonify({'status': 'ok'}), 200
-
-@app.route("/")
-def index():
-    return render_template("index.html", cv_available=cv_available)
-
-
-@app.route('/api/upload_audio', methods=['POST'])
-def upload_audio():
-    try:
-        if 'audio' not in request.files:
-            return jsonify({'error': 'No audio file'}), 400
-
-        audio_file = request.files['audio']
-
-        # Güvenli dosya adı ve geçici kaydetme
-        filename = secure_filename(audio_file.filename)
-        temp_path = os.path.join(app.config['UPLOAD_FOLDER'], f"temp_{filename}")
-        audio_file.save(temp_path)
-
-        # STT
-        try:
-            transcript = transcribe_file(temp_path) if stt_available else "[STT Modülü Yok]"
-            print(f"Transkript: {transcript}")
-        except Exception as e:
-            print(f"STT hatası: {e}")
-            transcript = "[STT Hatası]"
-
-        # LLM
-        try:
-            response_text = ask_openai(transcript) if llm_available else "Merhaba, nasılsın?"
-            print(f"LLM Yanıtı: {response_text}")
-        except Exception as e:
-            print(f"LLM hatası: {e}")
-            response_text = "Bir hata oluştu, tekrar deneyin."
-
-        # TTS (Rhubarb'sız, dosyaya yazan API)
-        try:
-            wav_path = tts_to_file(response_text)
-            if not wav_path or not os.path.exists(wav_path):
-                raise RuntimeError('TTS output missing')
-
-            audio_filename = os.path.basename(wav_path)
-
-            # Geçici dosyayı sil
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-
-            # cues_json artık opsiyonel (random lipsync kullanıyoruz)
-            return jsonify({'audio_url': '/audio/' + audio_filename, 'cues_json': None})
-        except Exception as e:
-            print(f'TTS hatas�: {e}')
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-            return jsonify({'error': str(e)}), 500
-    except Exception as e:
-        print(f"Genel upload hatası: {e}")
-        return jsonify({'error': 'Sunucu hatası'}), 500
-
-@app.route("/audio/<path:filename>")
-def get_audio(filename):
-    # Güvenlik ve uyumluluk: sadece dosya adını kullan
-    safe_name = os.path.basename(filename)
-    # Doğru içerik türü ve range desteği
-    return send_from_directory(RESULT_DIR, safe_name, mimetype='audio/wav', as_attachment=False, conditional=True)
+RESULT_DIR, safe_name, mimetype='audio/wav', as_attachment=False, conditional=True)
 
 # CV route'lar aynı kalsın...
 
 
 @app.route('/api/process_frame', methods=['POST'])
 def process_frame():
-    if not cv_available or not detection_system:
+    if not cv_available:
         return jsonify({
             'success': True,
             'objects': [],
@@ -181,12 +106,31 @@ def process_frame():
             'fingers': 0,
             'gesture': None,
             'fps': 0,
+            'cv_mode': CV_MODE,
             'processed_frame': CV_PLACEHOLDER
         })
 
     try:
         data = request.get_json()
         frame_data = data.get('frame', '')
+
+        if CV_MODE == 'lite' or not detection_system:
+            if not frame_data.startswith('data:image'):
+                processed_frame = f"data:image/jpeg;base64,{frame_data}"
+            else:
+                processed_frame = frame_data
+            return jsonify({
+                'success': True,
+                'objects': [],
+                'hands': 0,
+                'faces': 0,
+                'pose_detected': False,
+                'fingers': 0,
+                'gesture': None,
+                'fps': 0,
+                'cv_mode': CV_MODE,
+                'processed_frame': processed_frame
+            })
 
         if frame_data.startswith('data:image/jpeg;base64,'):
             frame_data = frame_data.split(',')[1]
@@ -209,15 +153,36 @@ def process_frame():
             'fingers': results.get('fingers', 0),
             'gesture': results.get('gesture', None),
             'fps': results.get('fps', 0),
+            'cv_mode': CV_MODE,
             'processed_frame': f"data:image/jpeg;base64,{processed_frame_base64}"
         })
 
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+        return jsonify({'success': False, 'error': str(e), 'cv_mode': CV_MODE})
+
 @app.route('/api/get_detection_results')
 def get_detection_results():
-    if not cv_available or not detection_system:
-        return jsonify({'success': False, 'error': 'CV modülü yüklenemedi'})
+    if not cv_available:
+        return jsonify({
+            'success': True,
+            'objects': [],
+            'hands': 0,
+            'faces': 0,
+            'pose_detected': False,
+            'fps': 0,
+            'cv_mode': CV_MODE
+        })
+
+    if CV_MODE == 'lite' or not detection_system:
+        return jsonify({
+            'success': True,
+            'objects': [],
+            'hands': 0,
+            'faces': 0,
+            'pose_detected': False,
+            'fps': 0,
+            'cv_mode': CV_MODE
+        })
 
     try:
         results = detection_system.get_detection_results()
@@ -227,14 +192,12 @@ def get_detection_results():
             'hands': results.get('hands', 0),
             'faces': results.get('faces', 0),
             'pose_detected': results.get('pose_detected', False),
-            'fps': results.get('fps', 0)
+            'fps': results.get('fps', 0),
+            'cv_mode': CV_MODE
         })
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+        return jsonify({'success': False, 'error': str(e), 'cv_mode': CV_MODE})
 
-# Not: Her istek sonunda kamerayı durdurmak performansı bozar. Kapatmayı uygulama
-# kapanışında yönetmek daha doğru. Bu yüzden teardown hook devre dışı.
-# import atexit; atexit.register(lambda: detection_system and detection_system.stop_camera())
 def shutdown_detection_system(exception=None):
     pass
 
