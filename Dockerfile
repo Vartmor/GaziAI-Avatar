@@ -21,4 +21,4 @@ RUN mkdir -p "$RESULT_DIR"
 
 EXPOSE 5000
 
-CMD ["gunicorn", "backend.main:app", "--bind", "0.0.0.0:5000", "--workers", "2"]
+CMD ["gunicorn", "backend.main:app", "--bind", "0.0.0.0:5000", "--workers", "1"]

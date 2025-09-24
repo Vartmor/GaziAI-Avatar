@@ -213,6 +213,7 @@ OS’e göre FFmpeg kurulumu:
 | --- | --- | --- |
 | Backend | OPENAI_API_KEY | OpenAI servislerine erisim icin zorunlu |
 | Backend | CORS_ORIGINS | Virgulle ayrilmis izinli origin listesi (`*` tum istemciler icin) |
+| Backend | ENABLE_COMPUTER_VISION | `true` ise CV pipeline acik, `false` ile devre disi (daha az bellek) |
 | Backend | RESULT_DIR | Uretilen ses dosyalarinin yazilacagi klasor (varsayilan `result/`) |
 | Backend | MAX_AUDIO_SIZE_MB | Upload dosyalarinin maksimum boyutu (MB olarak, varsayilan 10) |
 | Frontend | VITE_API_BASE_URL | Canli backend URL'si; bos birakilirsa tarayici ile ayni origin kullanilir |

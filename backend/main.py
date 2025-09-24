@@ -29,14 +29,18 @@ except ImportError:
     print("⚠️ LLM modülleri yüklenemedi")
     llm_available = False
 
-# Computer Vision modülleri
-try:
-    from computer_vision.unified_detection import UnifiedDetectionSystem  # Root'tan
-    cv_available = True
-    print("✅ Computer Vision modülleri başarıyla yüklendi!")
-except ImportError as e:
-    print(f"⚠️ Computer Vision modülleri yüklenemedi: {e}")
-    cv_available = False
+# Computer Vision modulleri
+cv_available = False
+if ENABLE_CV:
+    try:
+        from computer_vision.unified_detection import UnifiedDetectionSystem  # Root'tan
+        cv_available = True
+        print("Computer Vision modulleri basariyla yuklendi!")
+    except ImportError as e:
+        print(f"Uyari: Computer Vision modulleri yuklenemedi: {e}")
+        cv_available = False
+else:
+    print("Computer Vision modulleri konfigurasyon ile devre disi")
 
 app = Flask(__name__)
 app.secret_key = 'gazi-ai-secret-key'
@@ -52,6 +56,7 @@ else:
 CORS(app, resources={r"/api/*": {"origins": cors_origins}, r"/audio/*": {"origins": cors_origins}})
 
 RESULT_DIR = os.environ.get('RESULT_DIR', os.path.join(root_dir, 'result'))
+ENABLE_CV = os.getenv('ENABLE_COMPUTER_VISION', 'true').lower() == 'true'
 os.makedirs(RESULT_DIR, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = RESULT_DIR
 app.config['RESULT_DIR'] = RESULT_DIR
@@ -67,12 +72,10 @@ detection_system = None
 if cv_available:
     try:
         detection_system = UnifiedDetectionSystem()
-        print("✅ Computer Vision modülleri başarıyla yüklendi!")
+        print("Computer Vision modulleri basariyla baslatildi!")
     except Exception as e:
-        print(f"❌ Computer Vision başlatma hatası: {e}")
+        print(f"Hata: Computer Vision baslatma hatasi: {e}")
         cv_available = False
-else:
-    print("❌ Computer Vision modülleri yüklenemedi")
 
 # Ses dosyaları buraya kaydedilecek
 # Kamera başlatma fonksiyonu
