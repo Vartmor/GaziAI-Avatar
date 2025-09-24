@@ -89,7 +89,12 @@ if cv_available and CV_MODE == 'full':
 elif cv_available and CV_MODE == 'lite':
     print("Computer Vision lite mode: skipping heavy detection pipeline")
 
-RESULT_DIR, safe_name, mimetype='audio/wav', as_attachment=False, conditional=True)
+@app.route("/audio/<path:filename>")
+def get_audio(filename):
+    safe_name = os.path.basename(filename)
+    return send_from_directory(RESULT_DIR, safe_name, mimetype='audio/wav', as_attachment=False, conditional=True)
+
+
 
 # CV route'lar aynı kalsın...
 
