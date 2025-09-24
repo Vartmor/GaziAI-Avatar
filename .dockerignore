@@ -1,0 +1,16 @@
+.git
+.gitignore
+.env
+.env.*
+.vscode
+.venv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+backend/result
+frontend/node_modules
+frontend/dist
+**/node_modules
+**/dist
+*.wav

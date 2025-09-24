@@ -1,0 +1,487 @@
+---
+description: Get a 3D avatar GLB file with desired performance and configuration settings.
+---
+
+# GET - 3D avatar
+
+{% hint style="warning" %}
+All avatars are hosted in a CDN under _https://models.readyplayer.me._
+
+_Please always use the https://models.readyplayer.me URL for Avatar requests instead of https://api.readyplayer.me/._
+{% endhint %}
+
+## Get an avatar GLB by id.
+
+<mark style="color:blue;">`GET`</mark> `https://models.readyplayer.me/avatarId.glb`
+
+Get an avatar 3D GLB model with desired performance and configuration settings.
+
+#### Path Parameters
+
+| Name                                           | Type   | Description      |
+| ---------------------------------------------- | ------ | ---------------- |
+| avatarId.glb<mark style="color:red;">\*</mark> | String | ID of an avatar. |
+
+#### Query Parameters
+
+<table><thead><tr><th width="312">Name</th><th width="100">Type</th><th>Description</th></tr></thead><tbody><tr><td>quality</td><td>String</td><td>low, medium or high - Use quality presets to combine performance related parameters.</td></tr><tr><td>meshLod</td><td>Int</td><td>[Deprecated] Use lod instead.<br>Control the triangle count of the assets equipped on the avatar.</td></tr><tr><td>textureSizeLimit</td><td>Int</td><td>Sets the upper limit for texture resolution in pixels of any texture in the avatar.</td></tr><tr><td>textureAtlas</td><td>Int</td><td>Generates a texture atlas of the desired resolution. The operation merges all meshes and splits opaque objects from transparent ones resulting in a maximum of 2 draw calls.</td></tr><tr><td>textureChannels</td><td>String</td><td>Define which textureChannels should be included in the .glb. It can be a comma-separated combination of the following values: baseColor, normal, metallicRoughness, emissive, occlusion</td></tr><tr><td>morphTargets</td><td>String</td><td>Comma-separated list of individual morph targets or morph target standard groups to include on the avatar.</td></tr><tr><td>useDracoMeshCompression</td><td>Boolean</td><td>Reduces file size by compressing output avatars with Draco mesh compression. More effective on complex meshes.</td></tr><tr><td>useMeshOptCompression</td><td>Boolean</td><td>[Deprecated] Reduces file size by compressing output avatars with Mesh Optimization compression. More effective on meshes with morph targets.</td></tr><tr><td>useQuantizeMeshOptCompression</td><td>Boolean</td><td>Reduces file size by quantizing vertex attributes and compressing output avatars with Mesh Optimization compression. More effective on meshes with morph targets.</td></tr><tr><td>pose</td><td>String</td><td>Defines the pose for a full-body avatar.</td></tr><tr><td>useHands</td><td>Boolean</td><td>Toggles hands for half-body VR avatars.</td></tr><tr><td>textureFormat</td><td>String</td><td>Reduce avatar file size by formatting all textures into the specified format. Using webp encoding can result in up to 40% reduction in avatar file size. Supported values: webp, jpeg, png</td></tr><tr><td>lod</td><td>Int</td><td>Control the triangle count of the entire avatar.</td></tr><tr><td>textureQuality</td><td>String</td><td>Choose which texture quality preset to get on the avatar.</td></tr></tbody></table>
+
+{% tabs %}
+{% tab title="200: OK Model/gltf-binary of avatar." %}
+
+{% endtab %}
+
+{% tab title="404: Not Found The requested model is not available." %}
+```javascript
+{
+    // Response
+}
+```
+{% endtab %}
+{% endtabs %}
+
+### Parameters, expected values, and examples
+
+{% hint style="info" %}
+You can combine multiple parameters by concatenating with **&**.
+
+So for example requesting an avatar with lod 2 and without texture atlassing would look like that:
+
+<pre class="language-url"><code class="lang-url">https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?lod=2<a data-footnote-ref href="#user-content-fn-1">&#x26;</a>textureAtlas=none
+</code></pre>
+{% endhint %}
+
+## Parameters, expected values, and examples
+
+{% tabs %}
+{% tab title="/avatarId.glb" %}
+ID of an avatar.
+
+**Expected values (String)**
+
+* 65a8dba831b23abb4f401bae`.glb`
+
+{% hint style="warning" %}
+Deprecated - Requesting avatar by shortCode, instead request by avatar ID.
+{% endhint %}
+
+* `ABC123.glb`
+
+**Notes**
+
+**You must include the `.glb` file extension or you will get a `404` return value.**
+
+You can get an avatar id or short code via `postMessage` returned from [Ready Player Me](https://readyplayer.me/avatar). You can read more about how to do that at [Native Integration](../../../integration-guides/web-and-native-integration).
+
+{% hint style="info" %}
+Without any of the optional parameters, the avatar is returned based on default values.
+{% endhint %}
+{% endtab %}
+
+{% tab title="Examples" %}
+**Request avatar by ID**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb
+```
+
+{% hint style="warning" %}
+Deprecated - Requesting avatar by shortCode, instead request by avatar ID.
+{% endhint %}
+
+```
+https://models.readyplayer.me/ABC123.glb
+```
+
+**Returned value**
+
+You will receive a standardized [.glb file.](https://docs.fileformat.com/3d/glb/) You can import and modify this file in any 3D software that supports this format.
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?quality" %}
+Use quality presets to combine performance related parameters from below.
+
+**Expected Values (String)**
+
+* low
+* medium
+* high
+
+The values behind those presets are the following:
+
+* low (meshLod=2, textureSizeLimit=256, textureAtlas=256, morphTargets=none)
+* medium (meshLod=1, textureSizeLimit=512=textureAtlas=512, morphTargets=none)
+* high (meshLod=0, textureSizeLimit=1024=textureAtlas=1024, morphTargets=none)
+
+{% hint style="info" %}
+All other values overwrite quality. So e.g. you can use quality=low and overwrite the meshLod with 0 to get the high-res avatar. See Examples.
+{% endhint %}
+{% endtab %}
+
+{% tab title="Example" %}
+**Request an avatar with quality high**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?quality=high
+```
+
+**Request an avatar with quality medium**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?quality=medium
+```
+
+**Request an avatar with quality low**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?quality=low
+```
+
+**Request an avatar with quality low but overwrite meshLod**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?quality=low&meshLod=0
+```
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?lod" %}
+Control the triangle count of the entire avatar.
+
+**Expected values (Number)**
+
+* `0` - No triangle count reduction is applied (default).
+* `1` - Retain 50% of the original triangle count.
+* `2` - Retain 25% of the original triangle count.
+{% endtab %}
+
+{% tab title="Examples" %}
+**Request an avatar with lod 2**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?lod=2
+```
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?meshLod" %}
+{% hint style="warning" %}
+Deprecated - Please use `?lod` instead to get the best results.
+{% endhint %}
+
+Control the triangle count of the assets equipped on the avatar. This does not impact the quality of the head model of the avatar.
+
+**Expected values (Number)**
+
+* `0` - No triangle count reduction is applied (default).
+* `1` - Retain 50% of the original triangle count.
+* `2` - Retain 25% of the original triangle count.
+{% endtab %}
+
+{% tab title="Examples" %}
+{% hint style="warning" %}
+Deprecated - Please use `?lod` instead to get the best results.
+{% endhint %}
+
+**Request an avatar with meshLod 2**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?meshLod=2
+```
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?textureSizeLimit" %}
+Set the upper limit for texture resolution in pixels of any texture in the avatar.
+
+**Expected values (Number)**
+
+The value needs to be a multiple of two.
+
+* Min: `256`
+* Max: `1024` (default)
+{% endtab %}
+
+{% tab title="Examples" %}
+**Request an avatar with textureSize limited to 512 x 512**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?textureSizeLimit=512
+```
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?textureQuality" %}
+Set the quality for textures on the Avatar by choosing from one of the presets.
+
+**Expected values (String)**
+
+* `low` - overall lower quality textures on the avatar and equipped assets.
+* `medium` - higher quality head and upper body assets (default).
+* `high` - overall high quality textures on the whole avatar and assets.
+
+{% hint style="info" %}
+These options are intended to provide more optimization control when having to render many Avatars in a 3D scene. The intention for `low` quality is to be used for Avatars that are farther in the distance and don't require as much detail.&#x20;
+{% endhint %}
+{% endtab %}
+
+{% tab title="Examples" %}
+**Request an avatar with low quality textures**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?textureQuality=low
+```
+
+**Request an avatar with medium quality textures**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?textureQuality=medium
+```
+
+**Request an avatar with high quality textures**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?textureQuality=high
+```
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?textureAtlas" %}
+Generate a texture atlas of the desired resolution. This operation merges all meshes and splits opaque objects from transparent ones resulting in a maximum of 2 draw calls.
+
+The texture atlas is generated for all PBR channels - baseColor, normal, metallicRoughness, emissive, and occlusion, if any of the assets making up the avatar includes them.
+
+**Expected Values (String, Number)**
+
+* `none` - Do not create a texture atlas (default).
+* `256` - Create a texture atlas of 256x256px.
+* `512` - Create a texture atlas of 512x512px.
+* `1024` - Create a texture atlas of 1024x1024px.
+{% endtab %}
+
+{% tab title="Examples" %}
+**Disable texture atlas:**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?textureAtlas=none
+```
+
+**Create 512px texture atlas:**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?textureAtlas=512
+```
+
+<figure><img src="https://3222463673-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FM2pnrVNxW01XV9ilR0Ed%2Fuploads%2Fgit-blob-a7b1e8ad84f3be18149944f90a4f13f44527cb36%2Ftexture_atlas_on_2%20(1)%20(1)%20(1).png?alt=media" alt=""><figcaption><p>Atlasing on - 1 draw call (without transparent objects)</p></figcaption></figure>
+
+<figure><img src="https://3222463673-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FM2pnrVNxW01XV9ilR0Ed%2Fuploads%2Fgit-blob-1e999134962e4e602515f1712d8380f2b1132732%2Ftexture_atlas_off_2%20(1)%20(1)%20(1).png?alt=media" alt=""><figcaption><p>Atlassing off - 9 draw calls (without transparent objects)</p></figcaption></figure>
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?textureFormat" %}
+Reduce avatar file size by formatting all textures into the specified format.
+
+Using webp encoding can result in up to 40% reduction in avatar file size.
+
+{% hint style="info" %}
+At the moment, our Unity and Unreal SDKs do not officially support the WebP texture format. However, for web applications, utilizing the WebP format can be very effective to reduce avatar file size.
+{% endhint %}
+
+**Expected Values (String)**
+
+* webp
+* jpeg
+* png
+{% endtab %}
+
+{% tab title="Examples" %}
+**Get an avatar with webp encoded textures**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?textureFormat=webp
+```
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?textureChannels" %}
+Select the texture channels you want to have included in the .glb. (By default, the .glb comes with all available channels).
+
+**Expected Values (String)**
+
+* baseColor
+* normal
+* metallicRoughness
+* emissive
+* occlusion
+* none
+
+{% hint style="info" %}
+You can combine these values by comma separation. See examples.
+{% endhint %}
+{% endtab %}
+
+{% tab title="Examples" %}
+**Get avatar with no textures**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?textureChannels=none
+```
+
+**Get avatar with only baseColor and normal map.**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?textureChannels=baseColor,normal
+```
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?morphTargets" %}
+Comma-separated list of individual morph targets or morph target standard groups to include on the avatar.
+
+**Expected values (String)**
+
+* `Default`
+* `ARKit`
+* `Oculus Visemes`
+* \+ or any supported [morph targets](../../avatars/morph-targets).
+
+The default value is `"Default"`.
+{% endtab %}
+
+{% tab title="Examples" %}
+**Disable all morph targets**
+
+`?morphTargets=none`
+
+\
+**Use selected morph targets**\
+`?morphTargets=mouthSmile,mouthOpen`
+
+\
+**Use morph target standard groups**\
+`?morphTargets=ARKit,Oculus Visemes`
+
+\
+**Use selected morph targets and standard group**\
+`?morphTargets=mouthSmile,ARKit`
+
+**Example:**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?morphTargets=mouthSmile,ARKit
+```
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?pose" %}
+Define the pose for a full-body avatar.
+
+**Expected values (String)**
+
+* `A` - Create a full-body avatar in A pose (default).
+* `T` - Create a full-body avatar in T pose.
+
+{% hint style="info" %}
+Only applies to full-body avatars.
+{% endhint %}
+{% endtab %}
+
+{% tab title="Examples" %}
+**Create an avatar in T-pose**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?pose=T
+```
+
+**Create an avatar in A-pose**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?pose=A
+```
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?useDracoMeshCompression" %}
+Reduce the file size by compressing output avatars with Draco mesh compression.
+
+**Expected values (Boolean)**
+
+* `true` - Enable compression.
+* `false` - No compression (default).
+
+{% hint style="info" %}
+Draco mesh compression is disabled by default for maximum compatibility for various glTF loaders.
+{% endhint %}
+{% endtab %}
+
+{% tab title="Examples" %}
+**Request an avatar with Draco mesh compression turned on**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?useDracoMeshCompression=true
+```
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?useMeshOptCompression" %}
+Reduce the file size by compressing output avatars with Mesh Optimization compression. This technique is more effective on avatars with morph targets.
+
+**Expected values (Boolean)**
+
+* `true` - Enable compression.
+* `false` - No compression (default).
+
+{% hint style="info" %}
+Mesh Optimization compression is disabled by default for maximum compatibility for various glTF loaders.
+{% endhint %}
+{% endtab %}
+
+{% tab title="Examples" %}
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?useMeshOptCompression=true
+```
+{% endtab %}
+{% endtabs %}
+
+{% tabs %}
+{% tab title="?useHands" %}
+Toggle hands for half-body VR avatars.
+
+**Expected values (Boolean)**
+
+* `false` - Do not include hands with half-body VR avatars.
+* `true` - Include hands with half-body VR avatars (default).
+
+{% hint style="info" %}
+Only applies to half-body avatars.
+{% endhint %}
+{% endtab %}
+
+{% tab title="Examples" %}
+**Enable hands for half-body VR avatars**
+
+```
+https://models.readyplayer.me/65a8dba831b23abb4f401bae.glb?useHands=true
+```
+{% endtab %}
+{% endtabs %}
+
+{% hint style="danger" %}
+The default values above only apply when you have not requested any changes to those settings previously.\
+**Please reach out to** [**support@readyplayer.me**](mailto:support@readyplayer.me) **if you want to reset your default settings.**
+{% endhint %}
+
+[^1]: Combine meshLod and textureAtlas Parameter with &

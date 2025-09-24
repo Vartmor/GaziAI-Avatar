@@ -1,0 +1,41 @@
+# ------------------------------
+# Python / virtual‑env
+# ------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# ------------------------------
+# Environment files
+# ------------------------------
+.env
+.env.*
+
+# ------------------------------
+# Media / generated results
+# ------------------------------
+result/
+static/audio/
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+
+# ------------------------------
+# IDE / editor
+# ------------------------------
+.idea/
+.vscode/
+*.iml

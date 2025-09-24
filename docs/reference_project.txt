@@ -1,0 +1,575 @@
+r3f-lipsync-tutorial
+├─ all_files_content.txt
+├─ index.html
+├─ merge-files.cjs
+├─ package-lock.json
+├─ package.json
+├─ public
+│  ├─ animations
+│  │  ├─ Angry Gesture.fbx
+│  │  ├─ Idle.fbx
+│  │  └─ Standing Greeting.fbx
+│  ├─ audios
+│  │  ├─ pizzas.json
+│  │  ├─ pizzas.mp3
+│  │  ├─ pizzas.ogg
+│  │  ├─ welcome.json
+│  │  ├─ welcome.mp3
+│  │  └─ welcome.ogg
+│  ├─ models
+│  │  └─ 646d9dcdc8a5f5bddbfac913.glb
+│  ├─ textures
+│  │  ├─ youtubeBackground.jpg
+│  │  └─ youtubeBackgroundHawaii.jpg
+│  └─ vite.svg
+├─ README.md
+├─ src
+│  ├─ App.jsx
+│  ├─ assets
+│  │  └─ react.svg
+│  ├─ components
+│  │  ├─ Avatar.jsx
+│  │  └─ Experience.jsx
+│  ├─ index.css
+│  └─ main.jsx
+├─ vite.config.js
+└─ yarn.lock
+
+
+
+--- C:\Users\Muhammed\Documents\GitHub\r3f-lipsync-tutorial\index.html ---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+
+--- C:\Users\Muhammed\Documents\GitHub\r3f-lipsync-tutorial\package.json ---
+{
+  "name": "r3f-vite-starter",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@react-three/drei": "9.75.0",
+    "@react-three/fiber": "8.13.3",
+    "@types/three": "0.152.1",
+    "leva": "^0.9.35",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "three": "0.153.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
+    "@vitejs/plugin-react": "^3.1.0",
+    "vite": "^4.1.0"
+  }
+}
+
+
+--- C:\Users\Muhammed\Documents\GitHub\r3f-lipsync-tutorial\public\audios\pizzas.json ---
+{
+  "metadata": {
+    "soundFile": "/Users/wawa/Documents/Projects/wawasensei/r3f-lipsync-tutorial/Rhubarb-Lip-Sync-1.13.0-macOS/../public/audios/pizzas.ogg",
+    "duration": 6.92
+  },
+  "mouthCues": [
+    { "start": 0.00, "end": 0.04, "value": "X" },
+    { "start": 0.04, "end": 0.26, "value": "F" },
+    { "start": 0.26, "end": 0.33, "value": "C" },
+    { "start": 0.33, "end": 0.41, "value": "A" },
+    { "start": 0.41, "end": 0.66, "value": "B" },
+    { "start": 0.66, "end": 0.73, "value": "C" },
+    { "start": 0.73, "end": 0.87, "value": "B" },
+    { "start": 0.87, "end": 1.19, "value": "X" },
+    { "start": 1.19, "end": 1.26, "value": "B" },
+    { "start": 1.26, "end": 1.33, "value": "A" },
+    { "start": 1.33, "end": 1.50, "value": "B" },
+    { "start": 1.50, "end": 1.95, "value": "X" },
+    { "start": 1.95, "end": 2.28, "value": "B" },
+    { "start": 2.28, "end": 2.36, "value": "A" },
+    { "start": 2.36, "end": 2.63, "value": "B" },
+    { "start": 2.63, "end": 2.70, "value": "C" },
+    { "start": 2.70, "end": 2.84, "value": "B" },
+    { "start": 2.84, "end": 2.90, "value": "A" },
+    { "start": 2.90, "end": 2.96, "value": "C" },
+    { "start": 2.96, "end": 3.04, "value": "A" },
+    { "start": 3.04, "end": 3.21, "value": "E" },
+    { "start": 3.21, "end": 3.28, "value": "F" },
+    { "start": 3.28, "end": 3.75, "value": "B" },
+    { "start": 3.75, "end": 3.82, "value": "D" },
+    { "start": 3.82, "end": 4.02, "value": "B" },
+    { "start": 4.02, "end": 4.16, "value": "C" },
+    { "start": 4.16, "end": 4.23, "value": "B" },
+    { "start": 4.23, "end": 4.31, "value": "A" },
+    { "start": 4.31, "end": 4.51, "value": "C" },
+    { "start": 4.51, "end": 4.58, "value": "B" },
+    { "start": 4.58, "end": 4.65, "value": "C" },
+    { "start": 4.65, "end": 4.75, "value": "A" },
+    { "start": 4.75, "end": 4.88, "value": "B" },
+    { "start": 4.88, "end": 5.28, "value": "X" },
+    { "start": 5.28, "end": 5.41, "value": "F" },
+    { "start": 5.41, "end": 5.62, "value": "C" },
+    { "start": 5.62, "end": 5.90, "value": "B" },
+    { "start": 5.90, "end": 5.97, "value": "E" },
+    { "start": 5.97, "end": 6.04, "value": "F" },
+    { "start": 6.04, "end": 6.11, "value": "C" },
+    { "start": 6.11, "end": 6.18, "value": "B" },
+    { "start": 6.18, "end": 6.26, "value": "A" },
+    { "start": 6.26, "end": 6.51, "value": "B" },
+    { "start": 6.51, "end": 6.65, "value": "C" },
+    { "start": 6.65, "end": 6.92, "value": "X" }
+  ]
+}
+
+
+--- C:\Users\Muhammed\Documents\GitHub\r3f-lipsync-tutorial\public\audios\welcome.json ---
+{
+  "metadata": {
+    "soundFile": "/Users/wawa/Documents/Projects/wawasensei/r3f-lipsync-tutorial/Rhubarb-Lip-Sync-1.13.0-macOS/../public/audios/welcome.ogg",
+    "duration": 6.21
+  },
+  "mouthCues": [
+    { "start": 0.00, "end": 0.05, "value": "X" },
+    { "start": 0.05, "end": 0.27, "value": "D" },
+    { "start": 0.27, "end": 0.41, "value": "B" },
+    { "start": 0.41, "end": 0.49, "value": "A" },
+    { "start": 0.49, "end": 0.59, "value": "F" },
+    { "start": 0.59, "end": 0.66, "value": "B" },
+    { "start": 0.66, "end": 0.73, "value": "F" },
+    { "start": 0.73, "end": 0.80, "value": "D" },
+    { "start": 0.80, "end": 0.94, "value": "B" },
+    { "start": 0.94, "end": 1.01, "value": "C" },
+    { "start": 1.01, "end": 1.15, "value": "B" },
+    { "start": 1.15, "end": 1.29, "value": "C" },
+    { "start": 1.29, "end": 1.40, "value": "B" },
+    { "start": 1.40, "end": 1.47, "value": "F" },
+    { "start": 1.47, "end": 1.54, "value": "C" },
+    { "start": 1.54, "end": 1.61, "value": "B" },
+    { "start": 1.61, "end": 1.68, "value": "A" },
+    { "start": 1.68, "end": 1.79, "value": "F" },
+    { "start": 1.79, "end": 1.87, "value": "A" },
+    { "start": 1.87, "end": 1.93, "value": "C" },
+    { "start": 1.93, "end": 2.27, "value": "F" },
+    { "start": 2.27, "end": 2.37, "value": "A" },
+    { "start": 2.37, "end": 2.44, "value": "B" },
+    { "start": 2.44, "end": 2.58, "value": "C" },
+    { "start": 2.58, "end": 2.84, "value": "B" },
+    { "start": 2.84, "end": 2.90, "value": "H" },
+    { "start": 2.90, "end": 3.10, "value": "B" },
+    { "start": 3.10, "end": 3.24, "value": "E" },
+    { "start": 3.24, "end": 3.38, "value": "C" },
+    { "start": 3.38, "end": 3.52, "value": "F" },
+    { "start": 3.52, "end": 3.59, "value": "C" },
+    { "start": 3.59, "end": 3.80, "value": "B" },
+    { "start": 3.80, "end": 3.88, "value": "A" },
+    { "start": 3.88, "end": 4.10, "value": "B" },
+    { "start": 4.10, "end": 4.38, "value": "F" },
+    { "start": 4.38, "end": 4.45, "value": "D" },
+    { "start": 4.45, "end": 4.66, "value": "B" },
+    { "start": 4.66, "end": 4.73, "value": "C" },
+    { "start": 4.73, "end": 5.08, "value": "B" },
+    { "start": 5.08, "end": 5.15, "value": "G" },
+    { "start": 5.15, "end": 5.22, "value": "C" },
+    { "start": 5.22, "end": 5.30, "value": "A" },
+    { "start": 5.30, "end": 5.41, "value": "E" },
+    { "start": 5.41, "end": 5.50, "value": "A" },
+    { "start": 5.50, "end": 5.56, "value": "B" },
+    { "start": 5.56, "end": 5.69, "value": "D" },
+    { "start": 5.69, "end": 5.76, "value": "B" },
+    { "start": 5.76, "end": 5.83, "value": "C" },
+    { "start": 5.83, "end": 6.11, "value": "B" },
+    { "start": 6.11, "end": 6.21, "value": "X" }
+  ]
+}
+
+
+--- C:\Users\Muhammed\Documents\GitHub\r3f-lipsync-tutorial\README.md ---
+
+![Thumbnail](https://github.com/wass08/r3f-lipsync-tutorial/assets/6551176/b53625c5-88d0-4a84-ae4b-3da63d40b240)
+
+[Live preview](https://r3f-lipsync-tutorial.vercel.app/)
+
+[Video tutorial](https://youtu.be/egQFAeu6Ihw)
+
+```
+r3f-lipsync-tutorial
+├─ index.html
+├─ package.json
+├─ public
+│  ├─ animations
+│  │  ├─ Angry Gesture.fbx
+│  │  ├─ Idle.fbx
+│  │  └─ Standing Greeting.fbx
+│  ├─ audios
+│  │  ├─ pizzas.json
+│  │  ├─ pizzas.mp3
+│  │  ├─ pizzas.ogg
+│  │  ├─ welcome.json
+│  │  ├─ welcome.mp3
+│  │  └─ welcome.ogg
+│  ├─ models
+│  │  └─ 646d9dcdc8a5f5bddbfac913.glb
+│  ├─ textures
+│  │  ├─ youtubeBackground.jpg
+│  │  └─ youtubeBackgroundHawaii.jpg
+│  └─ vite.svg
+├─ README.md
+├─ src
+│  ├─ App.jsx
+│  ├─ assets
+│  │  └─ react.svg
+│  ├─ components
+│  │  ├─ Avatar.jsx
+│  │  └─ Experience.jsx
+│  ├─ index.css
+│  └─ main.jsx
+├─ vite.config.js
+└─ yarn.lock
+
+```
+
+--- C:\Users\Muhammed\Documents\GitHub\r3f-lipsync-tutorial\src\App.jsx ---
+import { Canvas } from "@react-three/fiber";
+import { Experience } from "./components/Experience";
+
+function App() {
+  return (
+    <Canvas shadows camera={{ position: [0, 0, 8], fov: 42 }}>
+      <color attach="background" args={["#ececec"]} />
+      <Experience />
+    </Canvas>
+  );
+}
+
+export default App;
+
+
+--- C:\Users\Muhammed\Documents\GitHub\r3f-lipsync-tutorial\src\components\Avatar.jsx ---
+/*
+Auto-generated by: https://github.com/pmndrs/gltfjsx
+Command: npx gltfjsx@6.2.3 public/models/646d9dcdc8a5f5bddbfac913.glb -o src/components/Avatar.jsx -r public
+*/
+
+import { useAnimations, useFBX, useGLTF } from "@react-three/drei";
+import { useFrame, useLoader } from "@react-three/fiber";
+import { useControls } from "leva";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+
+import * as THREE from "three";
+
+const corresponding = {
+  A: "viseme_PP",
+  B: "viseme_kk",
+  C: "viseme_I",
+  D: "viseme_AA",
+  E: "viseme_O",
+  F: "viseme_U",
+  G: "viseme_FF",
+  H: "viseme_TH",
+  X: "viseme_PP",
+};
+
+export function Avatar(props) {
+  const {
+    playAudio,
+    script,
+    headFollow,
+    smoothMorphTarget,
+    morphTargetSmoothing,
+  } = useControls({
+    playAudio: false,
+    headFollow: true,
+    smoothMorphTarget: true,
+    morphTargetSmoothing: 0.5,
+    script: {
+      value: "welcome",
+      options: ["welcome", "pizzas"],
+    },
+  });
+
+  const audio = useMemo(() => new Audio(`/audios/${script}.mp3`), [script]);
+  const jsonFile = useLoader(THREE.FileLoader, `audios/${script}.json`);
+  const lipsync = JSON.parse(jsonFile);
+
+  useFrame(() => {
+    const currentAudioTime = audio.currentTime;
+    if (audio.paused || audio.ended) {
+      setAnimation("Idle");
+      return;
+    }
+
+    Object.values(corresponding).forEach((value) => {
+      if (!smoothMorphTarget) {
+        nodes.Wolf3D_Head.morphTargetInfluences[
+          nodes.Wolf3D_Head.morphTargetDictionary[value]
+        ] = 0;
+        nodes.Wolf3D_Teeth.morphTargetInfluences[
+          nodes.Wolf3D_Teeth.morphTargetDictionary[value]
+        ] = 0;
+      } else {
+        nodes.Wolf3D_Head.morphTargetInfluences[
+          nodes.Wolf3D_Head.morphTargetDictionary[value]
+        ] = THREE.MathUtils.lerp(
+          nodes.Wolf3D_Head.morphTargetInfluences[
+            nodes.Wolf3D_Head.morphTargetDictionary[value]
+          ],
+          0,
+          morphTargetSmoothing
+        );
+
+        nodes.Wolf3D_Teeth.morphTargetInfluences[
+          nodes.Wolf3D_Teeth.morphTargetDictionary[value]
+        ] = THREE.MathUtils.lerp(
+          nodes.Wolf3D_Teeth.morphTargetInfluences[
+            nodes.Wolf3D_Teeth.morphTargetDictionary[value]
+          ],
+          0,
+          morphTargetSmoothing
+        );
+      }
+    });
+
+    for (let i = 0; i < lipsync.mouthCues.length; i++) {
+      const mouthCue = lipsync.mouthCues[i];
+      if (
+        currentAudioTime >= mouthCue.start &&
+        currentAudioTime <= mouthCue.end
+      ) {
+        if (!smoothMorphTarget) {
+          nodes.Wolf3D_Head.morphTargetInfluences[
+            nodes.Wolf3D_Head.morphTargetDictionary[
+              corresponding[mouthCue.value]
+            ]
+          ] = 1;
+          nodes.Wolf3D_Teeth.morphTargetInfluences[
+            nodes.Wolf3D_Teeth.morphTargetDictionary[
+              corresponding[mouthCue.value]
+            ]
+          ] = 1;
+        } else {
+          nodes.Wolf3D_Head.morphTargetInfluences[
+            nodes.Wolf3D_Head.morphTargetDictionary[
+              corresponding[mouthCue.value]
+            ]
+          ] = THREE.MathUtils.lerp(
+            nodes.Wolf3D_Head.morphTargetInfluences[
+              nodes.Wolf3D_Head.morphTargetDictionary[
+                corresponding[mouthCue.value]
+              ]
+            ],
+            1,
+            morphTargetSmoothing
+          );
+          nodes.Wolf3D_Teeth.morphTargetInfluences[
+            nodes.Wolf3D_Teeth.morphTargetDictionary[
+              corresponding[mouthCue.value]
+            ]
+          ] = THREE.MathUtils.lerp(
+            nodes.Wolf3D_Teeth.morphTargetInfluences[
+              nodes.Wolf3D_Teeth.morphTargetDictionary[
+                corresponding[mouthCue.value]
+              ]
+            ],
+            1,
+            morphTargetSmoothing
+          );
+        }
+
+        break;
+      }
+    }
+  });
+
+  useEffect(() => {
+    nodes.Wolf3D_Head.morphTargetInfluences[
+      nodes.Wolf3D_Head.morphTargetDictionary["viseme_I"]
+    ] = 1;
+    nodes.Wolf3D_Teeth.morphTargetInfluences[
+      nodes.Wolf3D_Teeth.morphTargetDictionary["viseme_I"]
+    ] = 1;
+    if (playAudio) {
+      audio.play();
+      if (script === "welcome") {
+        setAnimation("Greeting");
+      } else {
+        setAnimation("Angry");
+      }
+    } else {
+      setAnimation("Idle");
+      audio.pause();
+    }
+  }, [playAudio, script]);
+
+  const { nodes, materials } = useGLTF("/models/646d9dcdc8a5f5bddbfac913.glb");
+  const { animations: idleAnimation } = useFBX("/animations/Idle.fbx");
+  const { animations: angryAnimation } = useFBX(
+    "/animations/Angry Gesture.fbx"
+  );
+  const { animations: greetingAnimation } = useFBX(
+    "/animations/Standing Greeting.fbx"
+  );
+
+  idleAnimation[0].name = "Idle";
+  angryAnimation[0].name = "Angry";
+  greetingAnimation[0].name = "Greeting";
+
+  const [animation, setAnimation] = useState("Idle");
+
+  const group = useRef();
+  const { actions } = useAnimations(
+    [idleAnimation[0], angryAnimation[0], greetingAnimation[0]],
+    group
+  );
+
+  useEffect(() => {
+    actions[animation].reset().fadeIn(0.5).play();
+    return () => actions[animation].fadeOut(0.5);
+  }, [animation]);
+
+  // CODE ADDED AFTER THE TUTORIAL (but learnt in the portfolio tutorial ♥️)
+  useFrame((state) => {
+    if (headFollow) {
+      group.current.getObjectByName("Head").lookAt(state.camera.position);
+    }
+  });
+
+  return (
+    <group {...props} dispose={null} ref={group}>
+      <primitive object={nodes.Hips} />
+      <skinnedMesh
+        geometry={nodes.Wolf3D_Body.geometry}
+        material={materials.Wolf3D_Body}
+        skeleton={nodes.Wolf3D_Body.skeleton}
+      />
+      <skinnedMesh
+        geometry={nodes.Wolf3D_Outfit_Bottom.geometry}
+        material={materials.Wolf3D_Outfit_Bottom}
+        skeleton={nodes.Wolf3D_Outfit_Bottom.skeleton}
+      />
+      <skinnedMesh
+        geometry={nodes.Wolf3D_Outfit_Footwear.geometry}
+        material={materials.Wolf3D_Outfit_Footwear}
+        skeleton={nodes.Wolf3D_Outfit_Footwear.skeleton}
+      />
+      <skinnedMesh
+        geometry={nodes.Wolf3D_Outfit_Top.geometry}
+        material={materials.Wolf3D_Outfit_Top}
+        skeleton={nodes.Wolf3D_Outfit_Top.skeleton}
+      />
+      <skinnedMesh
+        geometry={nodes.Wolf3D_Hair.geometry}
+        material={materials.Wolf3D_Hair}
+        skeleton={nodes.Wolf3D_Hair.skeleton}
+      />
+      <skinnedMesh
+        name="EyeLeft"
+        geometry={nodes.EyeLeft.geometry}
+        material={materials.Wolf3D_Eye}
+        skeleton={nodes.EyeLeft.skeleton}
+        morphTargetDictionary={nodes.EyeLeft.morphTargetDictionary}
+        morphTargetInfluences={nodes.EyeLeft.morphTargetInfluences}
+      />
+      <skinnedMesh
+        name="EyeRight"
+        geometry={nodes.EyeRight.geometry}
+        material={materials.Wolf3D_Eye}
+        skeleton={nodes.EyeRight.skeleton}
+        morphTargetDictionary={nodes.EyeRight.morphTargetDictionary}
+        morphTargetInfluences={nodes.EyeRight.morphTargetInfluences}
+      />
+      <skinnedMesh
+        name="Wolf3D_Head"
+        geometry={nodes.Wolf3D_Head.geometry}
+        material={materials.Wolf3D_Skin}
+        skeleton={nodes.Wolf3D_Head.skeleton}
+        morphTargetDictionary={nodes.Wolf3D_Head.morphTargetDictionary}
+        morphTargetInfluences={nodes.Wolf3D_Head.morphTargetInfluences}
+      />
+      <skinnedMesh
+        name="Wolf3D_Teeth"
+        geometry={nodes.Wolf3D_Teeth.geometry}
+        material={materials.Wolf3D_Teeth}
+        skeleton={nodes.Wolf3D_Teeth.skeleton}
+        morphTargetDictionary={nodes.Wolf3D_Teeth.morphTargetDictionary}
+        morphTargetInfluences={nodes.Wolf3D_Teeth.morphTargetInfluences}
+      />
+    </group>
+  );
+}
+
+useGLTF.preload("/models/646d9dcdc8a5f5bddbfac913.glb");
+
+
+--- C:\Users\Muhammed\Documents\GitHub\r3f-lipsync-tutorial\src\components\Experience.jsx ---
+import { Environment, OrbitControls, useTexture } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
+import { Avatar } from "./Avatar";
+
+export const Experience = () => {
+  const texture = useTexture("textures/youtubeBackground.jpg");
+  const viewport = useThree((state) => state.viewport);
+
+  return (
+    <>
+      <OrbitControls />
+      <Avatar position={[0, -3, 5]} scale={2} />
+      <Environment preset="sunset" />
+      <mesh>
+        <planeGeometry args={[viewport.width, viewport.height]} />
+        <meshBasicMaterial map={texture} />
+      </mesh>
+    </>
+  );
+};
+
+
+--- C:\Users\Muhammed\Documents\GitHub\r3f-lipsync-tutorial\src\index.css ---
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+body {
+  margin: 0;
+}
+
+
+--- C:\Users\Muhammed\Documents\GitHub\r3f-lipsync-tutorial\src\main.jsx ---
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+
+--- C:\Users\Muhammed\Documents\GitHub\r3f-lipsync-tutorial\vite.config.js ---
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+})
+
+

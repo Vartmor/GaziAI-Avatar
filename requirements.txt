@@ -1,0 +1,11 @@
+Flask
+jinja2
+requests
+openai
+python-dotenv
+numpy
+mediapipe
+opencv-python
+protobuf
+Flask-Cors
+gunicorn
