@@ -39,3 +39,4 @@ Thumbs.db
 .idea/
 .vscode/
 *.iml
+merge-files.cjs
