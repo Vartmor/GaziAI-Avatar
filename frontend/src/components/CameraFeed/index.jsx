@@ -103,7 +103,7 @@ export default function CameraFeed() {
       const lowResCtx = lowResCanvasElement.getContext('2d');
       lowResCanvasElement.width = 320;
       lowResCanvasElement.height = 240;
-      lowResctx.drawImage(videoElement, 0, 0, 480, 360);
+      lowResCtx.drawImage(videoElement, 0, 0, 480, 360);
       const frameData = lowResCanvasElement.toDataURL('image/jpeg', 0.18);
 
       const response = await fetch(apiUrl('/api/process_frame'), {
