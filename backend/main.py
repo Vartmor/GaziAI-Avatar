@@ -43,20 +43,46 @@ CV_PLACEHOLDER = (
     "Computer vision disabled</text></svg>"
 )
 
-UnifiedDetectionSystem = None
+DEFAULT_CV_DATA = {
+    "objects": [],
+    "hands": 0,
+    "faces": 0,
+    "pose_detected": False,
+    "fingers": 0,
+    "gesture": None,
+    "fps": 0,
+}
+
+last_detection_results = DEFAULT_CV_DATA.copy()
+
 cv_available = False
+object_detector = None
+detection_system = None
+
 if ENABLE_CV:
     if CV_MODE == "lite":
-        cv_available = True
-        print("Computer Vision lite mode active: streaming raw camera frames")
+        try:
+            from computer_vision.object_detector import ObjectDetector  # type: ignore
+
+            object_detector = ObjectDetector()
+            cv_available = True
+            print("Computer Vision lite mode: on-demand detection")
+        except ImportError as exc:
+            print(f"Warning: Computer Vision modules failed to load: {exc}")
+        except Exception as exc:
+            print(f"Error initializing lite CV pipeline: {exc}")
     else:
         try:
             from computer_vision.unified_detection import UnifiedDetectionSystem  # type: ignore
 
+            detection_system = UnifiedDetectionSystem()
+            object_detector = detection_system.object_detector
             cv_available = True
             print("Computer Vision modules loaded successfully")
         except ImportError as exc:
             print(f"Warning: Computer Vision modules failed to load: {exc}")
+        except Exception as exc:
+            print(f"Error starting Computer Vision runtime: {exc}")
 else:
     print("Computer Vision disabled via configuration")
 
@@ -82,18 +108,6 @@ try:
     app.config["MAX_CONTENT_LENGTH"] = int(max_size_mb) * 1024 * 1024
 except ValueError:
     app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
-
-detection_system = None
-if cv_available and CV_MODE == "full" and UnifiedDetectionSystem is not None:
-    try:
-        detection_system = UnifiedDetectionSystem()
-        print("Computer Vision runtime started")
-    except Exception as exc:
-        print(f"Error starting Computer Vision runtime: {exc}")
-        cv_available = False
-elif cv_available and CV_MODE == "lite":
-    print("Computer Vision lite mode: skipping heavy detection pipeline")
-
 
 def initialize_camera():
     try:
@@ -173,16 +187,12 @@ def get_audio(filename):
 
 @app.route("/api/process_frame", methods=["POST"])
 def process_frame():
-    if not cv_available:
+    global last_detection_results
+
+    if not cv_available or object_detector is None:
         return jsonify({
             "success": True,
-            "objects": [],
-            "hands": 0,
-            "faces": 0,
-            "pose_detected": False,
-            "fingers": 0,
-            "gesture": None,
-            "fps": 0,
+            **DEFAULT_CV_DATA,
             "processed_frame": CV_PLACEHOLDER,
             "cv_mode": CV_MODE,
         })
@@ -190,45 +200,44 @@ def process_frame():
     data = request.get_json(silent=True) or {}
     frame_data = data.get("frame", "")
 
-    if CV_MODE == "lite" or not detection_system:
-        if not frame_data:
-            return jsonify({"success": False, "error": "Missing frame data", "cv_mode": CV_MODE}), 400
-        processed_frame = frame_data if frame_data.startswith("data:image") else f"data:image/jpeg;base64,{frame_data}"
-        return jsonify({
-            "success": True,
-            "objects": [],
-            "hands": 0,
-            "faces": 0,
-            "pose_detected": False,
-            "fingers": 0,
-            "gesture": None,
-            "fps": 0,
-            "processed_frame": processed_frame,
-            "cv_mode": CV_MODE,
-        })
+    if not frame_data:
+        return jsonify({"success": False, "error": "Missing frame data", "cv_mode": CV_MODE}), 400
 
     try:
-        if frame_data.startswith("data:image/jpeg;base64,"):
+        if frame_data.startswith("data:image"):
             frame_data = frame_data.split(",", 1)[1]
 
         frame_bytes = base64.b64decode(frame_data)
         nparr = np.frombuffer(frame_bytes, np.uint8)
         frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-        processed_frame, results = detection_system.object_detector.detect_objects(frame)
+        if frame is None:
+            raise ValueError("Decoded frame is empty")
+
+        inference_frame = frame
+        resized = False
+        if CV_MODE == "lite":
+            inference_frame = cv2.resize(frame, (320, 240))
+            resized = True
+
+        processed_frame, results = object_detector.detect_objects(inference_frame)
+
+        if resized:
+            processed_frame = cv2.resize(processed_frame, (frame.shape[1], frame.shape[0]))
+
+        payload = DEFAULT_CV_DATA.copy()
+        for key in payload:
+            if key in results:
+                payload[key] = results[key]
+
+        last_detection_results = payload.copy()
 
         _, buffer = cv2.imencode(".jpg", processed_frame)
         processed_frame_base64 = base64.b64encode(buffer).decode("utf-8")
 
         return jsonify({
             "success": True,
-            "objects": results.get("objects", []),
-            "hands": results.get("hands", 0),
-            "faces": results.get("faces", 0),
-            "pose_detected": results.get("pose_detected", False),
-            "fingers": results.get("fingers", 0),
-            "gesture": results.get("gesture", None),
-            "fps": results.get("fps", 0),
+            **payload,
             "processed_frame": f"data:image/jpeg;base64,{processed_frame_base64}",
             "cv_mode": CV_MODE,
         })
@@ -239,41 +248,36 @@ def process_frame():
 
 @app.route("/api/get_detection_results")
 def get_detection_results():
-    if not cv_available:
+    global last_detection_results
+
+    if not cv_available or object_detector is None:
         return jsonify({
             "success": True,
-            "objects": [],
-            "hands": 0,
-            "faces": 0,
-            "pose_detected": False,
-            "fps": 0,
+            **DEFAULT_CV_DATA,
             "cv_mode": CV_MODE,
         })
 
-    if CV_MODE == "lite" or not detection_system:
-        return jsonify({
-            "success": True,
-            "objects": [],
-            "hands": 0,
-            "faces": 0,
-            "pose_detected": False,
-            "fps": 0,
-            "cv_mode": CV_MODE,
-        })
+    if CV_MODE == "full" and detection_system:
+        try:
+            results = detection_system.get_detection_results()
+            payload = DEFAULT_CV_DATA.copy()
+            for key in payload:
+                if key in results:
+                    payload[key] = results[key]
+            last_detection_results = payload.copy()
+            return jsonify({
+                "success": True,
+                **payload,
+                "cv_mode": CV_MODE,
+            })
+        except Exception as exc:
+            return jsonify({"success": False, "error": str(exc), "cv_mode": CV_MODE})
 
-    try:
-        results = detection_system.get_detection_results()
-        return jsonify({
-            "success": True,
-            "objects": results.get("objects", []),
-            "hands": results.get("hands", 0),
-            "faces": results.get("faces", 0),
-            "pose_detected": results.get("pose_detected", False),
-            "fps": results.get("fps", 0),
-            "cv_mode": CV_MODE,
-        })
-    except Exception as exc:
-        return jsonify({"success": False, "error": str(exc), "cv_mode": CV_MODE})
+    return jsonify({
+        "success": True,
+        **last_detection_results,
+        "cv_mode": CV_MODE,
+    })
 
 
 def shutdown_detection_system(exception=None):
