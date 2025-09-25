@@ -31,9 +31,9 @@ export default function CameraFeed() {
 
         const mediaStream = await navigator.mediaDevices.getUserMedia({
           video: {
-            width: { ideal: 480, max: 480 },
-            height: { ideal: 360, max: 360 },
-            frameRate: { ideal: 20, max: 24 }
+            width: { ideal: 640, max: 640 },
+            height: { ideal: 480, max: 480 },
+            frameRate: { ideal: 24, max: 30 }
           }
         });
 
@@ -95,16 +95,25 @@ export default function CameraFeed() {
     isProcessingRef.current = true;
 
     try {
-      canvasElement.width = 480;
-      canvasElement.height = 360;
-      const ctx = canvasElement.getContext('2d');
-      ctx.drawImage(videoElement, 0, 0, 480, 360);
+      const HIGH_WIDTH = 640;
+      const HIGH_HEIGHT = 480;
+      canvasElement.width = HIGH_WIDTH;
+      canvasElement.height = HIGH_HEIGHT;
+      const highCtx = canvasElement.getContext('2d');
+      highCtx.drawImage(videoElement, 0, 0, HIGH_WIDTH, HIGH_HEIGHT);
 
-      const lowResCtx = lowResCanvasElement.getContext('2d');
-      lowResCanvasElement.width = 320;
-      lowResCanvasElement.height = 240;
-      lowResCtx.drawImage(videoElement, 0, 0, 480, 360);
-      const frameData = lowResCanvasElement.toDataURL('image/jpeg', 0.18);
+      let frameData;
+      if (cvMode === 'lite') {
+        const LOW_WIDTH = 320;
+        const LOW_HEIGHT = 240;
+        const lowResCtx = lowResCanvasElement.getContext('2d');
+        lowResCanvasElement.width = LOW_WIDTH;
+        lowResCanvasElement.height = LOW_HEIGHT;
+        lowResCtx.drawImage(videoElement, 0, 0, LOW_WIDTH, LOW_HEIGHT);
+        frameData = lowResCanvasElement.toDataURL('image/jpeg', 0.2);
+      } else {
+        frameData = canvasElement.toDataURL('image/jpeg', 0.55);
+      }
 
       const response = await fetch(apiUrl('/api/process_frame'), {
         method: 'POST',
@@ -133,7 +142,7 @@ export default function CameraFeed() {
         try { setCvResults(newCv); } catch {}
       }
     } catch (error) {
-      console.error('Frame işleme hatası:', error);
+      console.error('Frame i?leme hatas?:', error);
       await new Promise(resolve => setTimeout(resolve, 3000));
     } finally {
       isProcessingRef.current = false;
@@ -141,7 +150,7 @@ export default function CameraFeed() {
   };
 
   useEffect(() => {
-    const delay = cvMode === 'lite' ? 220 : 150;
+    const delay = cvMode === 'lite' ? 120 : 190;
     const interval = setInterval(processFrame, delay);
     return () => clearInterval(interval);
   }, [cvMode, stream]);

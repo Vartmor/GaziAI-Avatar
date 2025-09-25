@@ -64,7 +64,11 @@ if ENABLE_CV:
         try:
             from computer_vision.object_detector import ObjectDetector  # type: ignore
 
-            object_detector = ObjectDetector()
+            object_detector = ObjectDetector(
+                enable_pose=False,
+                enable_face_detection=True,
+                enable_face_mesh=False,
+            )
             cv_available = True
             print("Computer Vision lite mode: on-demand detection")
         except ImportError as exc:
